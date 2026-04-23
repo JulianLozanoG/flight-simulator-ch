@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flight_simulator
+    username: demo
+    password: test1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
