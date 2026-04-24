@@ -12,12 +12,18 @@ class GlobalExceptionHandler {
     @ExceptionHandler(FlightNotFoundException::class)
     fun handleFlightNotFound(ex: FlightNotFoundException): ResponseEntity<Map<String, String>> {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(mapOf("error" to ex.message.orEmpty()))
+            .body(mapOf("error" to (ex.message ?: "Flight not found")))
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ResponseEntity<Map<String, String>> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(mapOf("error" to "Validation failed"))
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgument(ex: IllegalArgumentException): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(mapOf("error" to (ex.message ?: "Bad request")))
     }
 }

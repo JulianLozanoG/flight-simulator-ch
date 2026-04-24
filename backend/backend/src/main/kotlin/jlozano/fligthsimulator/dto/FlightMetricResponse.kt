@@ -16,5 +16,6 @@ data class FlightMetricResponse(
     val longitude: Double,
     val fuelRemaining: Double,
     val outsideAirTemperatureC: Double,
-    val estimatedTimeToArrivalMinutes: Long
+    val estimatedTimeToArrivalMinutes: Long,
+    val progress: Double
 )
