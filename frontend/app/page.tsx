@@ -1,0 +1,101 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { FlightMap } from "@/components/FlightMap";
+import { FlightMetricsPanel } from "@/components/FlightMetricsPanel";
+import { FlightTimeline } from "@/components/FlightTimeline";
+import { createFlight, getFlight } from "@/lib/api";
+import { mockFlight } from "@/lib/mock-flight";
+import { FlightSimulation } from "@/lib/types";
+
+export default function Home() {
+  const [flight, setFlight] = useState<FlightSimulation>(mockFlight);
+  const [loading, setLoading] = useState(false);
+  const [activeFlightId, setActiveFlightId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleStartSimulation() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const created = await createFlight();
+      setActiveFlightId(created.id);
+
+      const flightData = await getFlight(created.id);
+      setFlight(flightData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start simulation");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!activeFlightId) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const updatedFlight = await getFlight(activeFlightId);
+        setFlight(updatedFlight);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to refresh flight");
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [activeFlightId]);
+
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8">
+        <header className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 shadow-lg backdrop-blur">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">
+                Flight Status Simulator
+              </p>
+              <h1 className="text-2xl font-semibold">
+                {flight.origin} → {flight.destination}
+              </h1>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-slate-300">
+                Status:{" "}
+                <span className="font-semibold text-emerald-400">{flight.status}</span>
+              </div>
+
+              <button
+                onClick={handleStartSimulation}
+                disabled={loading}
+                className="rounded-xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? "Starting..." : "Start Simulation"}
+              </button>
+            </div>
+          </div>
+
+          {activeFlightId && (
+            <p className="mt-3 text-xs text-slate-400">
+              Active Flight ID: <span className="text-slate-200">{activeFlightId}</span>
+            </p>
+          )}
+
+          {error && (
+            <p className="mt-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">
+              {error}
+            </p>
+          )}
+        </header>
+
+        <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+          <FlightMap flight={flight} />
+          <FlightMetricsPanel flight={flight} />
+        </section>
+
+        <FlightTimeline currentPhase={flight.currentPhase} />
+      </div>
+    </main>
+  );
+}
