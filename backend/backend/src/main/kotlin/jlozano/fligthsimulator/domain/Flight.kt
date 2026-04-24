@@ -16,7 +16,7 @@ data class Flight(
 
     @Id
     @GeneratedValue
-    var id: UUID? = null,
+    val id: UUID? = null,
 
     @Column(nullable = false)
     val origin: String,
@@ -31,6 +31,9 @@ data class Flight(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var currentPhase: FlightPhase = FlightPhase.BOARDING,
+
+    @Column(nullable = false)
+    var progress: Double = 0.0,
 
     @Column(nullable = false)
     val createdAt: Instant = Instant.now(),

@@ -49,5 +49,8 @@ data class FlightMetric(
     val outsideAirTemperatureC: Double,
 
     @Column(nullable = false)
-    val estimatedTimeToArrivalMinutes: Long
+    val estimatedTimeToArrivalMinutes: Long,
+
+    @Column(nullable = false)
+    val progress: Double
 )

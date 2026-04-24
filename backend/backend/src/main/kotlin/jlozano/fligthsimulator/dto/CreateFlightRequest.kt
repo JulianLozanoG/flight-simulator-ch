@@ -7,7 +7,5 @@ data class CreateFlightRequest(
     val origin: String,
 
     @field:NotBlank
-    val destination: String,
-
-    val accelerationFactor: Double? = null
+    val destination: String
 )
