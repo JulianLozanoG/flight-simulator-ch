@@ -55,7 +55,6 @@ class FlightServiceImpl(
             .orElseThrow { FlightNotFoundException("Flight with id $id not found") }
 
         val latestMetric = metricRepository.findTopByFlightIdOrderByTimestampDesc(id)
-
         return toResponse(flight, latestMetric)
     }
 
@@ -68,17 +67,22 @@ class FlightServiceImpl(
     }
 
     @Transactional
-    fun advanceFlight(id: UUID, nextProgress: Double): FlightResponse {
+    fun advanceFlight(id: UUID): FlightResponse {
         val flight = flightRepository.findById(id)
             .orElseThrow { FlightNotFoundException("Flight with id $id not found") }
 
-        val clampedProgress = nextProgress.coerceIn(0.0, 1.0)
-        val nextMetric = engine.generateMetric(flight, clampedProgress)
+        if (flight.status != FlightStatus.ACTIVE) {
+            val latestMetric = metricRepository.findTopByFlightIdOrderByTimestampDesc(id)
+            return toResponse(flight, latestMetric)
+        }
+
+        val nextProgress = engine.nextProgress(flight.progress)
+        val nextMetric = engine.generateMetric(flight, nextProgress)
         val savedMetric = metricRepository.save(nextMetric)
 
-        flight.progress = clampedProgress
+        flight.progress = nextProgress
         flight.currentPhase = savedMetric.phase
-        flight.status = if (clampedProgress >= 1.0) FlightStatus.COMPLETED else FlightStatus.ACTIVE
+        flight.status = if (nextProgress >= 1.0) FlightStatus.COMPLETED else FlightStatus.ACTIVE
         flight.updatedAt = savedMetric.timestamp
         flightRepository.save(flight)
 
@@ -93,7 +97,7 @@ class FlightServiceImpl(
             status = flight.status,
             currentPhase = flight.currentPhase,
             progress = flight.progress,
-            route = engine.routeForFlight(),
+            route = engine.routeForFlight(flight.origin, flight.destination),
             latestMetric = latestMetric?.let { toMetricResponse(it) }
         )
     }
