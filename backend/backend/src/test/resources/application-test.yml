@@ -1,0 +1,13 @@
+simulation:
+  accelerated-minutes-per-second: 1
+  default-route:
+    origin: LAX
+    destination: JFK
+  phases:
+    boarding-minutes: 30
+    taxi-out-minutes: 15
+    takeoff-climb-minutes: 25
+    cruise-minutes: 210
+    descent-minutes: 25
+    landing-minutes: 5
+    taxi-in-minutes: 10
