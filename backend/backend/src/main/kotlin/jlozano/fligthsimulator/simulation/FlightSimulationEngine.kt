@@ -6,15 +6,20 @@ import jlozano.fligthsimulator.domain.FlightMetric
 import jlozano.fligthsimulator.domain.FlightPhase
 import jlozano.fligthsimulator.dto.RoutePointResponse
 import java.time.Instant
+import kotlin.math.roundToInt
 
 class FlightSimulationEngine(
     private val properties: SimulationProperties
 ) {
+    fun nextProgress(currentProgress: Double): Double {
+        return (currentProgress + properties.progressIncrementPerTick).coerceAtMost(1.0)
+    }
+
     fun generateMetric(flight: Flight, progress: Double): FlightMetric {
         val phase = phaseFromProgress(progress)
         val altitude = altitudeFor(phase, progress)
         val airspeed = airspeedFor(phase)
-        val heading = (30 + (progress * 25)).toInt()
+        val heading = (30 + (progress * 25)).roundToInt()
         val fuel = (100 - progress * 55).coerceAtLeast(0.0)
         val temperature = temperatureFor(phase)
         val eta = ((1 - progress) * totalFlightMinutes()).toLong().coerceAtLeast(0)
@@ -36,7 +41,8 @@ class FlightSimulationEngine(
         )
     }
 
-    fun routeForFlight(): List<RoutePointResponse> {
+    fun routeForFlight(origin: String, destination: String): List<RoutePointResponse> {
+        // ruta visual no lineal base; luego puedes mejorarla con aeropuertos reales
         return listOf(
             RoutePointResponse(80.0, 320.0),
             RoutePointResponse(160.0, 240.0),
@@ -65,9 +71,9 @@ class FlightSimulationEngine(
         return when (phase) {
             FlightPhase.BOARDING -> 0
             FlightPhase.TAXI_OUT -> 0
-            FlightPhase.TAKEOFF_CLIMB -> (10000 + progress * 80000).toInt()
+            FlightPhase.TAKEOFF_CLIMB -> (10000 + progress * 80000).roundToInt()
             FlightPhase.CRUISE -> 32000
-            FlightPhase.DESCENT -> (32000 - (progress - 0.8) * 160000).toInt().coerceAtLeast(0)
+            FlightPhase.DESCENT -> (32000 - (progress - 0.8) * 160000).roundToInt().coerceAtLeast(0)
             FlightPhase.LANDING -> 3000
             FlightPhase.TAXI_IN -> 0
             FlightPhase.COMPLETED -> 0
@@ -97,7 +103,7 @@ class FlightSimulationEngine(
     }
 
     private fun positionFor(progress: Double): RoutePointResponse {
-        val route = routeForFlight()
+        val route = routeForFlight("", "")
         if (route.isEmpty()) return RoutePointResponse(0.0, 0.0)
         if (route.size == 1) return route.first()
 

@@ -5,6 +5,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "simulation")
 data class SimulationProperties(
     val acceleratedMinutesPerSecond: Int,
+    val schedulerIntervalMillis: Long,
+    val progressIncrementPerTick: Double,
     val defaultRoute: DefaultRoute,
     val phases: Phases
 ) {
