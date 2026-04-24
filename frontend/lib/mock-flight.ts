@@ -1,4 +1,4 @@
-import { FlightSimulation } from "./types";
+/*import { FlightSimulation } from "./types";
 
 export const mockFlight: FlightSimulation = {
   id: "flight-001",
@@ -28,4 +28,4 @@ export const mockFlight: FlightSimulation = {
     estimatedTimeToArrivalMinutes: 58,
     progress: 0.52,
   },
-};
+};*/

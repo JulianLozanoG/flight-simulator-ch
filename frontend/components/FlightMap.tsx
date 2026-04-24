@@ -1,8 +1,8 @@
 import { buildSvgPath, getPointAtProgress } from "@/lib/flight-path";
-import { FlightSimulation } from "@/lib/types";
+import { FlightResponse } from "@/lib/types";
 
 type FlightMapProps = {
-  flight: FlightSimulation;
+  flight: FlightResponse;
 };
 
 export function FlightMap({ flight }: FlightMapProps) {

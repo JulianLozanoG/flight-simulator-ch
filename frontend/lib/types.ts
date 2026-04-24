@@ -18,6 +18,7 @@ export interface RoutePoint {
 export interface FlightMetric {
   id?: string;
   flightId?: string;
+  timestamp?: string;
   phase: FlightPhase;
   altitudeFeet: number;
   airspeedKnots: number;
@@ -27,11 +28,10 @@ export interface FlightMetric {
   fuelRemaining: number;
   outsideAirTemperatureC: number;
   estimatedTimeToArrivalMinutes: number;
-  progress?: number;
-  timestamp?: string;
+  progress: number;
 }
 
-export interface FlightSimulation {
+export interface FlightResponse {
   id: string;
   origin: string;
   destination: string;
@@ -39,5 +39,5 @@ export interface FlightSimulation {
   currentPhase: FlightPhase;
   progress: number;
   route: RoutePoint[];
-  latestMetric: FlightMetric;
+  latestMetric: FlightMetric | null;
 }

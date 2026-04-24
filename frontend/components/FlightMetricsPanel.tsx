@@ -1,7 +1,7 @@
-import { FlightSimulation } from "@/lib/types";
+import { FlightResponse } from "@/lib/types";
 
 type FlightMetricsPanelProps = {
-  flight: FlightSimulation;
+  flight: FlightResponse;
 };
 
 export function FlightMetricsPanel({ flight }: FlightMetricsPanelProps) {
@@ -12,13 +12,13 @@ export function FlightMetricsPanel({ flight }: FlightMetricsPanelProps) {
       <h2 className="mb-4 text-lg font-semibold">Flight Metrics</h2>
 
       <div className="space-y-4">
-        <Metric label="Current Phase" value={metric.phase} />
-        <Metric label="Altitude" value={`${metric.altitudeFeet.toLocaleString()} ft`} />
-        <Metric label="Airspeed" value={`${metric.airspeedKnots} kt`} />
-        <Metric label="Heading" value={`${metric.headingDegrees}°`} />
-        <Metric label="Fuel Remaining" value={`${metric.fuelRemaining}%`} />
-        <Metric label="Outside Temp" value={`${metric.outsideAirTemperatureC} °C`} />
-        <Metric label="ETA" value={`${metric.estimatedTimeToArrivalMinutes} min`} />
+        <Metric label="Current Phase" value={metric?.phase ?? flight.currentPhase} />
+        <Metric label="Altitude" value={`${metric?.altitudeFeet ?? 0} ft`} />
+        <Metric label="Airspeed" value={`${metric?.airspeedKnots ?? 0} kt`} />
+        <Metric label="Heading" value={`${metric?.headingDegrees ?? 0}°`} />
+        <Metric label="Fuel Remaining" value={`${metric?.fuelRemaining ?? 0}%`} />
+        <Metric label="Outside Temp" value={`${metric?.outsideAirTemperatureC ?? 0} °C`} />
+        <Metric label="ETA" value={`${metric?.estimatedTimeToArrivalMinutes ?? 0} min`} />
       </div>
     </aside>
   );

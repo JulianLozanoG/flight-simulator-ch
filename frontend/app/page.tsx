@@ -5,13 +5,42 @@ import { FlightMap } from "@/components/FlightMap";
 import { FlightMetricsPanel } from "@/components/FlightMetricsPanel";
 import { FlightTimeline } from "@/components/FlightTimeline";
 import { createFlight, getFlight } from "@/lib/api";
-import { mockFlight } from "@/lib/mock-flight";
-import { FlightSimulation } from "@/lib/types";
+import { FlightResponse } from "@/lib/types";
+
+const EMPTY_FLIGHT: FlightResponse = {
+  id: "",
+  origin: "MDE",
+  destination: "BOG",
+  status: "ACTIVE",
+  currentPhase: "BOARDING",
+  progress: 0,
+  route: [
+    { x: 80, y: 320 },
+    { x: 160, y: 240 },
+    { x: 260, y: 280 },
+    { x: 380, y: 170 },
+    { x: 520, y: 210 },
+    { x: 650, y: 130 },
+    { x: 780, y: 180 },
+  ],
+  latestMetric: {
+    phase: "BOARDING",
+    altitudeFeet: 0,
+    airspeedKnots: 0,
+    headingDegrees: 0,
+    latitude: 0,
+    longitude: 0,
+    fuelRemaining: 100,
+    outsideAirTemperatureC: 12,
+    estimatedTimeToArrivalMinutes: 0,
+    progress: 0,
+  },
+};
 
 export default function Home() {
-  const [flight, setFlight] = useState<FlightSimulation>(mockFlight);
-  const [loading, setLoading] = useState(false);
+  const [flight, setFlight] = useState<FlightResponse>(EMPTY_FLIGHT);
   const [activeFlightId, setActiveFlightId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleStartSimulation() {
@@ -22,8 +51,8 @@ export default function Home() {
       const created = await createFlight();
       setActiveFlightId(created.id);
 
-      const flightData = await getFlight(created.id);
-      setFlight(flightData);
+      const current = await getFlight(created.id);
+      setFlight(current);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to start simulation");
     } finally {
@@ -36,8 +65,8 @@ export default function Home() {
 
     const interval = setInterval(async () => {
       try {
-        const updatedFlight = await getFlight(activeFlightId);
-        setFlight(updatedFlight);
+        const updated = await getFlight(activeFlightId);
+        setFlight(updated);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to refresh flight");
       }

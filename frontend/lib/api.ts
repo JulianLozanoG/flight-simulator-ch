@@ -1,8 +1,8 @@
-import { FlightMetric, FlightSimulation } from "./types";
+import { FlightMetric, FlightResponse } from "./types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
-export async function createFlight(): Promise<{ id: string }> {
+export async function createFlight(): Promise<FlightResponse> {
   const response = await fetch(`${API_BASE_URL}/flights`, {
     method: "POST",
     headers: {
@@ -21,7 +21,7 @@ export async function createFlight(): Promise<{ id: string }> {
   return response.json();
 }
 
-export async function getFlight(id: string): Promise<FlightSimulation> {
+export async function getFlight(id: string): Promise<FlightResponse> {
   const response = await fetch(`${API_BASE_URL}/flights/${id}`);
 
   if (!response.ok) {
